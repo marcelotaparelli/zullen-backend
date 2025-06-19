@@ -1,0 +1,84 @@
+version: '3.4'
+
+networks:
+  webapiapp:
+
+services:
+  webapidb:
+    container_name: webapidb
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - 8002:8002
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=password@1234#
+    networks:
+      - webapiapp
+
+  tododb:
+    container_name: tododb
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - 8003:8003
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=password@1234#
+    networks:
+      - webapiapp
+   
+  authdb:
+    container_name: authdb
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - 8004:8004
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=password@1234#
+    networks:
+      - webapiapp  
+
+  webapi:
+    container_name: webapi
+    image: ${DOCKER_REGISTRY-}webapi
+    build:
+      context: WebAPI
+      dockerfile: Dockerfile
+    ports:
+      - 8001:8080
+    depends_on:
+      - webapidb
+    networks:
+      - webapiapp
+
+  blazor-app:
+    container_name: blazor-app
+    image: ${DOCKER_REGISTRY-}blazor-app                               
+    build:
+      context: ../../../Blazor/BlazorApp 
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 5047:8080
+    depends_on:
+      - authdb  
+      - webapi
+    networks:
+      - webapiapp
+
+      
+  #angular-project:
+    #container_name: angular-project
+    #image: ${DOCKER_REGISTRY-}angular-project                               
+    #build:
+      #context: ../../AngularProject/angular-project 
+      #dockerfile: Dockerfile
+    #environment:
+      #NODE_ENV: production
+    #ports:
+     # - 4200:80
+    #depends_on:
+     # - webapi
+    #networks:
+     # - webapiapp
+    

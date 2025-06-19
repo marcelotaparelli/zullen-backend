@@ -1,0 +1,21 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "webapi": "StartDebugging"
+      }
+    }
+  },
+
+  "webapi": {
+    "commandName": "Project",
+    "launchBrowser": true,
+    "launchUrl": "webapi",
+    "applicationUrl": "https://*:8001;http://*:8001",
+    "environmentVariables": {
+      "ASPNETCORE_ENVIRONMENT": "Development"
+    }
+  }
+}

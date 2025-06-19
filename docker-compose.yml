@@ -1,0 +1,29 @@
+version: '3.4'
+
+networks:
+  webapiapp:
+
+services:
+  webapidb:
+    container_name: webapidb
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - 8002:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=password@1234#
+    networks:
+      - webapiapp
+
+  webapi:
+    container_name: webapi
+    image: ${DOCKER_REGISTRY-}webapi
+    build:
+      context: WebAPI/WebAPI
+      dockerfile: Dockerfile
+    ports:
+      - 8001:8080
+    depends_on:
+      - webapidb
+    networks:
+      - webapiapp

@@ -1,0 +1,77 @@
+name: dockercompose9988307949976128850
+services:
+  angular-project:
+    build:
+      context: C:\Users\Marcelo Taparelli\OneDrive\Desktop\MyThing\Zullen\AngularProject\angular-project
+      dockerfile: Dockerfile
+    container_name: angular-project
+    depends_on:
+      webapi:
+        condition: service_started
+        required: true
+    environment:
+      NODE_ENV: production
+    image: angular-project
+    networks:
+      webapiapp: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "4200"
+        protocol: tcp
+  webapi:
+    build:
+      context: C:\Users\Marcelo Taparelli\OneDrive\Desktop\MyThing\Zullen\ZullenApp\WebAPI\WebAPI
+      dockerfile: Dockerfile
+    container_name: webapi
+    depends_on:
+      webapidb:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+    image: webapi
+    networks:
+      webapiapp: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8001"
+        protocol: tcp
+      - mode: ingress
+        target: 8080
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\Marcelo Taparelli\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\Marcelo Taparelli\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  webapidb:
+    container_name: webapidb
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: password@1234#
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    networks:
+      webapiapp: null
+    ports:
+      - mode: ingress
+        target: 1433
+        published: "8002"
+        protocol: tcp
+networks:
+  webapiapp:
+    name: dockercompose9988307949976128850_webapiapp
